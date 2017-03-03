@@ -18,8 +18,12 @@ iOS 版本请前往 [https://github.com/lexrus/Huahui](https://github.com/lexrus
 <img src="screenshot.png" width="270" height="480" alt="screenshot"/>
 
 ### 特别感谢 ###
-- [花灰 iOS](https://github.com/lexrus/Huahui) 提供灵感
+- [花灰 iOS](https://github.com/lexrus/Huahui) 提供开发灵感
 - [中国程序员容易发音错误的单词](https://github.com/shimohq/chinese-programmer-wrong-pronunciation) 提供单词列表
 
 ### 开源库 ###
 - [BaseRecyclerViewAdapterHelper](https://github.com/CymChad/BaseRecyclerViewAdapterHelper)
+
+### 联系我 ###
+* Email:[me@liyuyu.cn](mailto:me@liyuyu.cn)
+* Weibo:[@呵呵小小鱼](http://weibo.com/u/1241167880)
