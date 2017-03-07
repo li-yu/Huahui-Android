@@ -35,7 +35,7 @@ public class WordAdapter extends BaseQuickAdapter<Word, BaseViewHolder> {
         helper.getView(R.id.image_play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Player.getInstance().play(String.format("http://dict.youdao.com/dictvoice?audio=%s&type=1", item.getName()));
+                Player.getInstance().play(item.getVoice());
             }
         });
     }
