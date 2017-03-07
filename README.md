@@ -6,22 +6,35 @@ iOS 版本请前往 [https://github.com/lexrus/Huahui](https://github.com/lexrus
 
 这个项目是 『中国程序员常读错的英文单词的 App』 的 Android 版本，简单粗暴。
 
-陈列了一些中国程序员经常读错的单词，纠正发音！使用原生 MediaPlayer 播放网络单词音频，没有其他多余功能了。
+陈列了一些中国程序员经常读错的单词，纠正发音！使用 jsoup 爬取网页上的单词列表；使用原生 MediaPlayer 播放网络单词音频，没有其他多余功能了。
 
 ### 下载 
 
-[直接下载](http://7xp1a1.com1.z0.glb.clouddn.com/HuaHui/huahui_v1.0_20170303.apk)
+[直接下载](http://7xp1a1.com1.z0.glb.clouddn.com/HuaHui/huahui_v1.1_20170307.apk)
 
 ![qcode](qcode.png)
+
+### 版本更新
+
+v1.1 - 20170307
+- 单词列表改从网络拉取，实时更新
+- 新增本地缓存功能，体验更好
+
+v1.0 - 20170303
+- 初版发布
 
 ### 截图 ###
 <img src="screenshot.png" width="270" height="480" alt="screenshot"/>
 
 ### 特别感谢 ###
-- [花灰 iOS](https://github.com/lexrus/Huahui) 提供开发灵感
+- [花灰 iOS](https://github.com/lexrus/Huahui) 提供开发灵感 和 App 图标
 - [中国程序员容易发音错误的单词](https://github.com/shimohq/chinese-programmer-wrong-pronunciation) 提供单词列表
 
 ### 开源库 ###
+- [jsoup](https://github.com/jhy/jsoup)
+- [LitePal](https://github.com/LitePalFramework/LitePal)
+- [RxJava](https://github.com/ReactiveX/RxJava)
+- [RxAndroid](https://github.com/ReactiveX/RxAndroid)
 - [BaseRecyclerViewAdapterHelper](https://github.com/CymChad/BaseRecyclerViewAdapterHelper)
 
 ### 联系我 ###

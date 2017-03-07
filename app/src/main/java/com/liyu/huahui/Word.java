@@ -1,21 +1,24 @@
 package com.liyu.huahui;
 
+import org.litepal.crud.DataSupport;
+
 /**
  * Created by liyu on 2017/3/2.
  */
 
-public class Word {
+public class Word extends DataSupport {
 
     private String name;
     private String correct;
     private String wrong;
-    private boolean hasVoice;
+    private String voice;
 
-    public Word(String name, String correct, String wrong, boolean hasVoice) {
-        this.name = name;
-        this.correct = correct;
-        this.wrong = wrong;
-        this.hasVoice = hasVoice;
+    public String getVoice() {
+        return voice;
+    }
+
+    public void setVoice(String voice) {
+        this.voice = voice;
     }
 
     public String getCorrect() {
@@ -24,14 +27,6 @@ public class Word {
 
     public void setCorrect(String correct) {
         this.correct = correct;
-    }
-
-    public boolean isHasVoice() {
-        return hasVoice;
-    }
-
-    public void setHasVoice(boolean hasVoice) {
-        this.hasVoice = hasVoice;
     }
 
     public String getName() {

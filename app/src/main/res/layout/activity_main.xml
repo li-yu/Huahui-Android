@@ -39,6 +39,17 @@
                     android:textColor="@android:color/white"
                     android:textSize="24sp"/>
 
+                <TextView
+                    android:id="@+id/tv_total"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"/>
+
             </RelativeLayout>
 
             <android.support.v7.widget.Toolbar

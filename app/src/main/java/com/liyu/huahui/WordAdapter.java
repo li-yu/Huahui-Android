@@ -29,7 +29,7 @@ public class WordAdapter extends BaseQuickAdapter<Word, BaseViewHolder> {
         } else {
             helper.setText(R.id.tv_wrong, "错误：" + item.getWrong());
         }
-        helper.setVisible(R.id.image_play, item.isHasVoice());
+        helper.setVisible(R.id.image_play, !TextUtils.isEmpty(item.getVoice()));
         ((TextView) helper.getView(R.id.tv_wrong)).getPaint()
                 .setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
         helper.getView(R.id.image_play).setOnClickListener(new View.OnClickListener() {

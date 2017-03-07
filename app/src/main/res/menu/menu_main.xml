@@ -3,9 +3,15 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.liyu.huahui.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_home_page"
         android:orderInCategory="100"
         android:icon="@drawable/ic_github"
-        android:title="@string/action_settings"
+        android:title="@string/action_home_page"
         app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_sync"
+        android:orderInCategory="101"
+        android:title="@string/action_sync"
+        app:showAsAction="never"/>
 </menu>
