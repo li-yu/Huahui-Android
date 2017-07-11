@@ -4,6 +4,7 @@ import android.graphics.Paint;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
@@ -11,6 +12,7 @@ import com.liyu.huahui.R;
 import com.liyu.huahui.model.Word;
 import com.liyu.huahui.utils.CacheUtil;
 import com.liyu.huahui.utils.DownloadUtil;
+import com.liyu.huahui.utils.NetworkUtil;
 import com.liyu.huahui.utils.Player;
 
 import java.util.List;
@@ -62,8 +64,12 @@ public class WordAdapter extends BaseQuickAdapter<Word, BaseViewHolder> {
         String fileUri = CacheUtil.getInstance().getString(item.getName());
 
         if (TextUtils.isEmpty(fileUri)) {
-            Player.getInstance().play(item.getVoice());
-            DownloadUtil.start(item.getName(), item.getVoice());
+            if (NetworkUtil.isConnected()) {
+                Player.getInstance().play(item.getVoice());
+                DownloadUtil.start(item.getName(), item.getVoice());
+            } else {
+                Toast.makeText(mContext, "网络连接不可用！", Toast.LENGTH_SHORT).show();
+            }
         } else {
             Player.getInstance().play(fileUri);
         }
