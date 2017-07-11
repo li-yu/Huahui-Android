@@ -7,7 +7,7 @@
 
     <list>
 
-        <mapping class="com.liyu.huahui.Word"></mapping>
+        <mapping class="com.liyu.huahui.model.Word"></mapping>
 
     </list>
 

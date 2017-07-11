@@ -1,4 +1,4 @@
-package com.liyu.huahui;
+package com.liyu.huahui.ui;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -12,6 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.liyu.huahui.utils.DownloadUtil;
+import com.liyu.huahui.utils.Player;
+import com.liyu.huahui.R;
+import com.liyu.huahui.model.Word;
+import com.liyu.huahui.adapter.WordAdapter;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -149,6 +155,27 @@ public class MainActivity extends AppCompatActivity {
             DataSupport.deleteAll(Word.class);
             getWords();
             return true;
+        } else if (id == R.id.action_cache) {
+            List<Word> words = DataSupport.findAll(Word.class);
+            DownloadUtil.start(words, new DownloadUtil.MultiFileDownloadListener() {
+                @Override
+                public void onProcess(String msg) {
+                    showDialog(msg);
+                }
+
+                @Override
+                public void onCompleted() {
+                    closeDialog();
+                    Toast.makeText(MainActivity.this, "缓存成功！", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFail(String msg) {
+                    closeDialog();
+                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                }
+            });
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -177,5 +204,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Player.getInstance().destroy();
+        DownloadUtil.stop();
     }
 }

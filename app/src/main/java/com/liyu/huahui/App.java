@@ -1,6 +1,9 @@
 package com.liyu.huahui;
 
 import android.app.Application;
+import android.content.Context;
+
+import com.liulishuo.filedownloader.FileDownloader;
 
 import org.litepal.LitePal;
 
@@ -10,9 +13,17 @@ import org.litepal.LitePal;
 
 public class App extends Application {
 
+    private static Context mContext;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = getApplicationContext();
         LitePal.initialize(this);
+        FileDownloader.setupOnApplicationOnCreate(this);
+    }
+
+    public static Context getContext(){
+        return mContext;
     }
 }

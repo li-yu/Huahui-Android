@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">花灰</string>
     <string name="action_home_page">访问项目主页</string>
-    <string name="action_sync">同步单词列表</string>
+    <string name="action_sync">同步单词</string>
+    <string name="action_cache">缓存音频</string>
 </resources>

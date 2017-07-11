@@ -1,4 +1,4 @@
-package com.liyu.huahui;
+package com.liyu.huahui.utils;
 
 import android.media.MediaPlayer;
 

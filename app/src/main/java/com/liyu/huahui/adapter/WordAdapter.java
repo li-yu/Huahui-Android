@@ -1,4 +1,4 @@
-package com.liyu.huahui;
+package com.liyu.huahui.adapter;
 
 import android.graphics.Paint;
 import android.text.TextUtils;
@@ -7,6 +7,11 @@ import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.liyu.huahui.R;
+import com.liyu.huahui.model.Word;
+import com.liyu.huahui.utils.CacheUtil;
+import com.liyu.huahui.utils.DownloadUtil;
+import com.liyu.huahui.utils.Player;
 
 import java.util.List;
 
@@ -23,21 +28,46 @@ public class WordAdapter extends BaseQuickAdapter<Word, BaseViewHolder> {
     @Override
     protected void convert(BaseViewHolder helper, final Word item) {
         helper.setText(R.id.tv_name, item.getName());
+
         helper.setText(R.id.tv_correct, "正确：" + item.getCorrect());
+
         if (TextUtils.isEmpty(item.getWrong())) {
             helper.setText(R.id.tv_wrong, item.getWrong());
         } else {
             helper.setText(R.id.tv_wrong, "错误：" + item.getWrong());
         }
+
         helper.setVisible(R.id.image_play, !TextUtils.isEmpty(item.getVoice()));
+
         ((TextView) helper.getView(R.id.tv_wrong)).getPaint()
                 .setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
+
         helper.getView(R.id.image_play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Player.getInstance().play(item.getVoice());
+                playVoice(item);
             }
         });
+
+        helper.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playVoice(item);
+            }
+        });
+    }
+
+    private void playVoice(Word item) {
+
+        String fileUri = CacheUtil.getInstance().getString(item.getName());
+
+        if (TextUtils.isEmpty(fileUri)) {
+            Player.getInstance().play(item.getVoice());
+            DownloadUtil.start(item.getName(), item.getVoice());
+        } else {
+            Player.getInstance().play(fileUri);
+        }
+
     }
 
 }
