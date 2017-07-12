@@ -22,8 +22,8 @@ public class DownloadUtil {
 
     private static Handler handler = new Handler(Looper.getMainLooper());
 
-    public static void start(final String word, String url) {
-        FileDownloader.getImpl().create(url).setPath(App.getContext().getFilesDir().getPath() + "/" + word + ".mp3")
+    public static void start(Word word, final SingleFileDownloadListener listener) {
+        FileDownloader.getImpl().create(word.getVoice()).setTag(word.getName()).setPath(App.getContext().getFilesDir().getPath() + "/" + word + ".mp3")
                 .setListener(new FileDownloadListener() {
                     @Override
                     protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
@@ -38,7 +38,9 @@ public class DownloadUtil {
                     @Override
                     protected void completed(BaseDownloadTask task) {
 
-                        CacheUtil.getInstance().put(word, task.getPath());
+                        if (listener != null) {
+                            listener.onCompleted(task.getPath());
+                        }
 
                     }
 
@@ -49,7 +51,9 @@ public class DownloadUtil {
 
                     @Override
                     protected void error(BaseDownloadTask task, Throwable e) {
-
+                        if (listener != null) {
+                            listener.onFail(e.getMessage());
+                        }
                     }
 
                     @Override
@@ -84,7 +88,6 @@ public class DownloadUtil {
 
             @Override
             protected void completed(BaseDownloadTask task) {
-                CacheUtil.getInstance().put((String) task.getTag(), task.getPath());
             }
 
             @Override
@@ -159,6 +162,13 @@ public class DownloadUtil {
         void onProcess(String msg);
 
         void onCompleted();
+
+        void onFail(String msg);
+    }
+
+    public interface SingleFileDownloadListener {
+
+        void onCompleted(String path);
 
         void onFail(String msg);
     }

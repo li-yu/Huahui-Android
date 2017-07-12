@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.liyu.huahui.utils.DownloadUtil;
+import com.liyu.huahui.utils.NetworkUtil;
 import com.liyu.huahui.utils.Player;
 import com.liyu.huahui.R;
 import com.liyu.huahui.model.Word;
@@ -156,6 +157,10 @@ public class MainActivity extends AppCompatActivity {
             getWords();
             return true;
         } else if (id == R.id.action_cache) {
+            if (!NetworkUtil.isConnected()) {
+                Toast.makeText(MainActivity.this, "网络连接不可用！", Toast.LENGTH_SHORT).show();
+                return true;
+            }
             List<Word> words = DataSupport.findAll(Word.class);
             DownloadUtil.start(words, new DownloadUtil.MultiFileDownloadListener() {
                 @Override

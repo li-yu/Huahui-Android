@@ -10,9 +10,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.liyu.huahui.R;
 import com.liyu.huahui.model.Word;
-import com.liyu.huahui.utils.CacheUtil;
 import com.liyu.huahui.utils.DownloadUtil;
-import com.liyu.huahui.utils.NetworkUtil;
 import com.liyu.huahui.utils.Player;
 
 import java.util.List;
@@ -60,19 +58,17 @@ public class WordAdapter extends BaseQuickAdapter<Word, BaseViewHolder> {
     }
 
     private void playVoice(Word item) {
-
-        String fileUri = CacheUtil.getInstance().getString(item.getName());
-
-        if (TextUtils.isEmpty(fileUri)) {
-            if (NetworkUtil.isConnected()) {
-                Player.getInstance().play(item.getVoice());
-                DownloadUtil.start(item.getName(), item.getVoice());
-            } else {
-                Toast.makeText(mContext, "网络连接不可用！", Toast.LENGTH_SHORT).show();
+        DownloadUtil.start(item, new DownloadUtil.SingleFileDownloadListener() {
+            @Override
+            public void onCompleted(String path) {
+                Player.getInstance().play(path);
             }
-        } else {
-            Player.getInstance().play(fileUri);
-        }
+
+            @Override
+            public void onFail(String msg) {
+                Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
