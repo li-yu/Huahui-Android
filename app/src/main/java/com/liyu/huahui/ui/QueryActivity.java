@@ -15,7 +15,6 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.liyu.huahui.App;
 import com.liyu.huahui.R;
@@ -30,7 +29,6 @@ import com.liyu.huahui.utils.YoudaoUtil;
 
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -107,8 +105,9 @@ public class QueryActivity extends AppCompatActivity {
                     public void onNext(YoudaoResponse youdaoResponse) {
                         Word word = new Word();
                         word.setName(youdaoResponse.getQuery());
-                        word.setCorrect(String.format("[%s]", youdaoResponse.getBasic().getPhonetic()));
-                        word.setVoice(String.format("http://dict.youdao.com/dictvoice?audio=%s&type=1", youdaoResponse.getQuery()));
+                        word.setCorrectPhonetic(String.format("[%s]", youdaoResponse.getBasic().getPhonetic()));
+                        word.setVoiceUrl(String.format("http://dict.youdao.com/dictvoice?audio=%s&type=1", youdaoResponse.getQuery()));
+                        word.setSourceFrom(Word.From.LOCAL);
                         Intent i = new Intent();
                         i.putExtra(EXTRA_WORD, word);
                         setResult(RESULT_OK, i);

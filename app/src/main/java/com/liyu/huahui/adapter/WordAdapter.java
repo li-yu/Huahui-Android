@@ -1,6 +1,8 @@
 package com.liyu.huahui.adapter;
 
 import android.graphics.Paint;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -10,6 +12,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.liyu.huahui.R;
 import com.liyu.huahui.model.Word;
+import com.liyu.huahui.ui.MainActivity;
 import com.liyu.huahui.utils.DownloadUtil;
 import com.liyu.huahui.utils.Player;
 
@@ -26,18 +29,18 @@ public class WordAdapter extends BaseQuickAdapter<Word, BaseViewHolder> {
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, final Word item) {
+    protected void convert(final BaseViewHolder helper, final Word item) {
         helper.setText(R.id.tv_name, item.getName());
 
-        helper.setText(R.id.tv_correct, "正确：" + item.getCorrect());
+        helper.setText(R.id.tv_correct, "正确：" + item.getCorrectPhonetic());
 
-        if (TextUtils.isEmpty(item.getWrong())) {
-            helper.setText(R.id.tv_wrong, item.getWrong());
+        if (TextUtils.isEmpty(item.getWrongPhonetic())) {
+            helper.setText(R.id.tv_wrong, item.getWrongPhonetic());
         } else {
-            helper.setText(R.id.tv_wrong, "错误：" + item.getWrong());
+            helper.setText(R.id.tv_wrong, "错误：" + item.getWrongPhonetic());
         }
 
-        helper.setVisible(R.id.image_play, !TextUtils.isEmpty(item.getVoice()));
+        helper.setVisible(R.id.image_play, !TextUtils.isEmpty(item.getVoiceUrl()));
 
         ((TextView) helper.getView(R.id.tv_wrong)).getPaint()
                 .setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
@@ -53,6 +56,24 @@ public class WordAdapter extends BaseQuickAdapter<Word, BaseViewHolder> {
             @Override
             public void onClick(View v) {
                 playVoice(item);
+            }
+        });
+
+        helper.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                final int deletedPosition = helper.getAdapterPosition();
+                remove(deletedPosition);
+                item.delete();
+                Snackbar.make(((MainActivity) mContext).getWindow().getDecorView().getRootView().findViewById(R.id.coordinatorLayout), "删除成功!",
+                        Snackbar.LENGTH_LONG).setAction("撤销", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        addData(deletedPosition, item);
+                        item.save();
+                    }
+                }).setActionTextColor(ContextCompat.getColor(mContext, R.color.snackbar_action_color)).show();
+                return false;
             }
         });
     }

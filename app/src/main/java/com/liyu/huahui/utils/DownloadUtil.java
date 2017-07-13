@@ -23,7 +23,7 @@ public class DownloadUtil {
     private static Handler handler = new Handler(Looper.getMainLooper());
 
     public static void start(Word word, final SingleFileDownloadListener listener) {
-        FileDownloader.getImpl().create(word.getVoice()).setTag(word.getName()).setPath(App.getContext().getFilesDir().getPath() + "/" + word + ".mp3")
+        FileDownloader.getImpl().create(word.getVoiceUrl()).setTag(word.getName()).setPath(App.getContext().getFilesDir().getPath() + "/" + word + ".mp3")
                 .setListener(new FileDownloadListener() {
                     @Override
                     protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
@@ -116,8 +116,8 @@ public class DownloadUtil {
         final List<BaseDownloadTask> tasks = new ArrayList<>();
 
         for (Word word : list) {
-            if (!TextUtils.isEmpty(word.getVoice()))
-                tasks.add(FileDownloader.getImpl().create(word.getVoice()).setPath(App.getContext().getFilesDir().getPath() + "/" + word.getName() + ".mp3").setTag(word.getName()));
+            if (!TextUtils.isEmpty(word.getVoiceUrl()))
+                tasks.add(FileDownloader.getImpl().create(word.getVoiceUrl()).setPath(App.getContext().getFilesDir().getPath() + "/" + word.getName() + ".mp3").setTag(word.getName()));
         }
 
         queueSet.disableCallbackProgressTimes();

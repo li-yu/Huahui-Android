@@ -6,4 +6,5 @@
     <color name="white">#ffffff</color>
     <color name="dialog_background_color">#fafafa</color>
     <color name="dialog_background_scrim">#99323232</color>
+    <color name="snackbar_action_color">#8BB2DE</color>
 </resources>

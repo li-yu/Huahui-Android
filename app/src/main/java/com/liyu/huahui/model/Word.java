@@ -11,24 +11,33 @@ import java.io.Serializable;
 public class Word extends DataSupport implements Serializable {
 
     private String name;
-    private String correct;
-    private String wrong;
-    private String voice;
+    private String correctPhonetic;
+    private String wrongPhonetic;
+    private String voiceUrl;
+    private int sourceFrom;
 
-    public String getVoice() {
-        return voice;
+    public int getSourceFrom() {
+        return sourceFrom;
     }
 
-    public void setVoice(String voice) {
-        this.voice = voice;
+    public void setSourceFrom(From sourceFrom) {
+        this.sourceFrom = sourceFrom.getFrom();
     }
 
-    public String getCorrect() {
-        return correct;
+    public String getVoiceUrl() {
+        return voiceUrl;
     }
 
-    public void setCorrect(String correct) {
-        this.correct = correct;
+    public void setVoiceUrl(String voiceUrl) {
+        this.voiceUrl = voiceUrl;
+    }
+
+    public String getCorrectPhonetic() {
+        return correctPhonetic;
+    }
+
+    public void setCorrectPhonetic(String correctPhonetic) {
+        this.correctPhonetic = correctPhonetic;
     }
 
     public String getName() {
@@ -39,12 +48,12 @@ public class Word extends DataSupport implements Serializable {
         this.name = name;
     }
 
-    public String getWrong() {
-        return wrong;
+    public String getWrongPhonetic() {
+        return wrongPhonetic;
     }
 
-    public void setWrong(String wrong) {
-        this.wrong = wrong;
+    public void setWrongPhonetic(String wrongPhonetic) {
+        this.wrongPhonetic = wrongPhonetic;
     }
 
     @Override
@@ -57,5 +66,25 @@ public class Word extends DataSupport implements Serializable {
         return name != null ? name.toLowerCase().equals(word.name.toLowerCase()) : word.name == null;
 
     }
+
+    public enum From {
+        LOCAL(1),
+        NETWORK(2);
+
+        private int from;
+
+        From(int from) {
+            this.from = from;
+        }
+
+        public int getFrom() {
+            return from;
+        }
+
+        public void setFrom(int from) {
+            this.from = from;
+        }
+    }
+
 
 }

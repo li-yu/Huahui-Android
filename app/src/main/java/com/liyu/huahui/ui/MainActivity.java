@@ -30,7 +30,10 @@ import org.jsoup.select.Elements;
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import rx.Observable;
@@ -83,7 +86,9 @@ public class MainActivity extends AppCompatActivity {
         Observable<List<Word>> database = Observable.create(new Observable.OnSubscribe<List<Word>>() {
             @Override
             public void call(Subscriber<? super List<Word>> subscriber) {
-                List<Word> words = DataSupport.findAll(Word.class);
+                List<Word> words = DataSupport
+                        .where("sourceFrom =?", String.valueOf(Word.From.NETWORK.getFrom()))
+                        .find(Word.class);
                 if (words == null || words.isEmpty()) {
                     subscriber.onCompleted();
                 } else {
@@ -111,13 +116,13 @@ public class MainActivity extends AppCompatActivity {
                                 Word word = new Word();
                                 word.setName(tds.get(0).ownText());
                                 Element a = tds.get(0).select("a").first();
-                                word.setVoice(a == null ? "" : a.attr("href"));
-                                word.setCorrect(tds.get(1).ownText());
-                                word.setWrong(tds.get(2).ownText());
+                                word.setVoiceUrl(a == null ? "" : a.attr("href"));
+                                word.setCorrectPhonetic(tds.get(1).ownText());
+                                word.setWrongPhonetic(tds.get(2).ownText());
+                                word.setSourceFrom(Word.From.NETWORK);
                                 words.add(word);
                             }
                         }
-                        DataSupport.deleteAll(Word.class);
                         DataSupport.saveAll(words);
                         return words;
                     }
@@ -143,11 +148,23 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(List<Word> words) {
-                        tvTotal.setText(String.format("总计：%s个", words.size()));
-                        adapter.setNewData(words);
+                        List<Word> allWords = DataSupport.findAll(Word.class);
+                        tvTotal.setText(String.format("总计：%s个", allWords.size()));
+                        adapter.setNewData(allWords);
+                        sortData();
                     }
                 });
 
+    }
+
+    private void sortData() {
+        final Collator collator = Collator.getInstance();
+        Collections.sort(adapter.getData(), new Comparator<Word>() {
+            @Override
+            public int compare(Word o1, Word o2) {
+                return collator.compare(o1.getName(), o2.getName());
+            }
+        });
     }
 
     @Override
@@ -168,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             return true;
         } else if (id == R.id.action_sync) {
-            DataSupport.deleteAll(Word.class);
+            DataSupport.deleteAll(Word.class, "sourceFrom =?", String.valueOf(Word.From.NETWORK.getFrom()));
             getWords();
             return true;
         } else if (id == R.id.action_cache) {
@@ -234,12 +251,14 @@ public class MainActivity extends AppCompatActivity {
             Word word = (Word) data.getSerializableExtra(QueryActivity.EXTRA_WORD);
             if (adapter.getData().contains(word)) {
                 Toast.makeText(this, "列表中已包含 " + word.getName(), Toast.LENGTH_SHORT).show();
-            } else if (word.getCorrect().contains("null")) {
+            } else if (word.getCorrectPhonetic().contains("null")) {
                 Toast.makeText(this, "该单词没有找到合适的读法", Toast.LENGTH_SHORT).show();
             } else {
                 word.save();
                 adapter.addData(word);
-                recyclerView.scrollToPosition(adapter.getData().size() - 1);
+                sortData();
+                int wordIndex = adapter.getData().indexOf(word);
+                recyclerView.scrollToPosition(wordIndex);
             }
         }
     }
