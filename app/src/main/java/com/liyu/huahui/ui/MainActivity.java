@@ -1,15 +1,18 @@
 package com.liyu.huahui.ui;
 
+import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
     private WordAdapter adapter;
     private ProgressDialog dialog;
     private TextView tvTotal;
+    private FloatingActionButton fabAdd;
+
+    private static final int REQUEST_QUERY_WORD = 110;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +56,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        fabAdd = (FloatingActionButton) findViewById(R.id.fab_add);
+        fabAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, QueryActivity.class);
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, fabAdd, getString(R.string.transition_dialog));
+                startActivityForResult(intent, REQUEST_QUERY_WORD, options.toBundle());
+            }
+        });
         tvTotal = (TextView) findViewById(R.id.tv_total);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -210,5 +225,22 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Player.getInstance().destroy();
         DownloadUtil.stop();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_QUERY_WORD && resultCode == RESULT_OK && data != null) {
+            Word word = (Word) data.getSerializableExtra(QueryActivity.EXTRA_WORD);
+            if (adapter.getData().contains(word)) {
+                Toast.makeText(this, "列表中已包含 " + word.getName(), Toast.LENGTH_SHORT).show();
+            } else if (word.getCorrect().contains("null")) {
+                Toast.makeText(this, "该单词没有找到合适的读法", Toast.LENGTH_SHORT).show();
+            } else {
+                word.save();
+                adapter.addData(word);
+                recyclerView.scrollToPosition(adapter.getData().size() - 1);
+            }
+        }
     }
 }

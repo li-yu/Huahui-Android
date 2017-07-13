@@ -64,4 +64,18 @@
 
     <include layout="@layout/content_main"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:background="@color/colorPrimary"
+        app:borderWidth="0dp"
+        app:fabSize="auto"
+        app:layout_anchor="@+id/recyclerView"
+        app:layout_anchorGravity="end|bottom"
+        app:layout_behavior="com.liyu.huahui.utils.FloatingActionButtonScrollBehavior"
+        app:srcCompat="@drawable/ic_add"/>
+
 </android.support.design.widget.CoordinatorLayout>

@@ -3,4 +3,5 @@
     <string name="action_home_page">访问项目主页</string>
     <string name="action_sync">同步单词</string>
     <string name="action_cache">缓存音频</string>
+    <string name="transition_dialog">transition_dialog</string>
 </resources>

@@ -3,4 +3,7 @@
     <color name="colorPrimary">#130c0e</color>
     <color name="colorPrimaryDark">#130c0e</color>
     <color name="colorAccent">#130c0e</color>
+    <color name="white">#ffffff</color>
+    <color name="dialog_background_color">#fafafa</color>
+    <color name="dialog_background_scrim">#99323232</color>
 </resources>

@@ -2,11 +2,13 @@ package com.liyu.huahui.model;
 
 import org.litepal.crud.DataSupport;
 
+import java.io.Serializable;
+
 /**
  * Created by liyu on 2017/3/2.
  */
 
-public class Word extends DataSupport {
+public class Word extends DataSupport implements Serializable {
 
     private String name;
     private String correct;
@@ -44,4 +46,16 @@ public class Word extends DataSupport {
     public void setWrong(String wrong) {
         this.wrong = wrong;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Word word = (Word) o;
+
+        return name != null ? name.toLowerCase().equals(word.name.toLowerCase()) : word.name == null;
+
+    }
+
 }
