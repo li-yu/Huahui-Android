@@ -24,6 +24,8 @@ import java.util.List;
 
 public class WordAdapter extends BaseQuickAdapter<Word, BaseViewHolder> {
 
+    private OnDataChangedListener listener;
+
     public WordAdapter(int layoutResId, List<Word> data) {
         super(layoutResId, data);
     }
@@ -65,12 +67,18 @@ public class WordAdapter extends BaseQuickAdapter<Word, BaseViewHolder> {
                 final int deletedPosition = helper.getAdapterPosition();
                 remove(deletedPosition);
                 item.delete();
+                if (listener != null) {
+                    listener.onChanged(getData().size());
+                }
                 Snackbar.make(((MainActivity) mContext).getWindow().getDecorView().getRootView().findViewById(R.id.coordinatorLayout), "删除成功!",
                         Snackbar.LENGTH_LONG).setAction("撤销", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         addData(deletedPosition, item);
                         item.save();
+                        if (listener != null) {
+                            listener.onChanged(getData().size());
+                        }
                     }
                 }).setActionTextColor(ContextCompat.getColor(mContext, R.color.snackbar_action_color)).show();
                 return false;
@@ -93,4 +101,11 @@ public class WordAdapter extends BaseQuickAdapter<Word, BaseViewHolder> {
 
     }
 
+    public interface OnDataChangedListener {
+        void onChanged(int dateSize);
+    }
+
+    public void setDataChangedListener(OnDataChangedListener listener) {
+        this.listener = listener;
+    }
 }

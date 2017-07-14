@@ -23,12 +23,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.QueryActivity"
-                  android:parentActivityName=".ui.MainActivity"
-                  android:theme="@style/AppTheme.Dialog">
+        <activity
+            android:name=".ui.QueryActivity"
+            android:parentActivityName=".ui.MainActivity"
+            android:theme="@style/AppTheme.Dialog"
+            android:windowSoftInputMode="adjustResize|stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.liyu.huahui.ui.MainActivity"/>></activity>
+                android:value="com.liyu.huahui.ui.MainActivity"/>>
+        </activity>
     </application>
 
 </manifest>

@@ -15,6 +15,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.liyu.huahui.App;
 import com.liyu.huahui.R;
@@ -26,6 +27,9 @@ import com.liyu.huahui.ui.widgets.MorphFabToDialog;
 import com.liyu.huahui.ui.widgets.MorphTransition;
 import com.liyu.huahui.ui.widgets.ProgressButton;
 import com.liyu.huahui.utils.YoudaoUtil;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -74,7 +78,14 @@ public class QueryActivity extends AppCompatActivity {
     private void query() {
         String word = editText.getEditableText().toString().trim();
         if (TextUtils.isEmpty(word)) {
-            editText.setError("单词为什么是空的！");
+            editText.setError("为什么是空的！");
+            return;
+        }
+        String patternWords = "[a-zA-Z1-9 ]{1,}";
+        Pattern r = Pattern.compile(patternWords);
+        Matcher m = r.matcher(word);
+        if (!m.matches()) {
+            editText.setError("这货不是单词啊！");
             return;
         }
         progressButton.startAnim();
@@ -98,11 +109,17 @@ public class QueryActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        editText.setEnabled(true);
+                        Toast.makeText(QueryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        finishAfterTransition();
+
                     }
 
                     @Override
                     public void onNext(YoudaoResponse youdaoResponse) {
+                        if (youdaoResponse.getBasic() == null || TextUtils.isEmpty(youdaoResponse.getQuery())) {
+                            Toast.makeText(QueryActivity.this, "没有查到这个单词！", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         Word word = new Word();
                         word.setName(youdaoResponse.getQuery());
                         word.setCorrectPhonetic(String.format("[%s]", youdaoResponse.getBasic().getPhonetic()));

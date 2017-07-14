@@ -196,7 +196,9 @@ public class ProgressButton extends View {
             public void onAnimationEnd(Animation animation) {
 
                 clearAnimation();
-                mOnStopAnim.Stop();
+                if (mOnStopAnim != null) {
+                    mOnStopAnim.Stop();
+                }
                 mSpac = 0;
                 invalidate();
 

@@ -74,6 +74,12 @@ public class MainActivity extends AppCompatActivity {
         adapter = new WordAdapter(R.layout.item_word, null);
         adapter.openLoadAnimation();
         recyclerView.setAdapter(adapter);
+        adapter.setDataChangedListener(new WordAdapter.OnDataChangedListener() {
+            @Override
+            public void onChanged(int dateSize) {
+                tvTotal.setText(String.format("总计：%s个", dateSize));
+            }
+        });
         getWords();
     }
 
@@ -257,8 +263,9 @@ public class MainActivity extends AppCompatActivity {
                 word.save();
                 adapter.addData(word);
                 sortData();
+                adapter.notifyDataSetChanged();
                 int wordIndex = adapter.getData().indexOf(word);
-                recyclerView.scrollToPosition(wordIndex);
+                recyclerView.smoothScrollToPosition(wordIndex);
             }
         }
     }
