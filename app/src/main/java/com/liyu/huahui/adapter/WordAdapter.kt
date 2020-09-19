@@ -1,15 +1,12 @@
 package com.liyu.huahui.adapter;
 
 import android.graphics.Paint;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.BaseViewHolder;
+import com.chad.library.adapter.base.*;
+import com.google.android.material.snackbar.Snackbar;
 import com.liyu.huahui.R;
 import com.liyu.huahui.model.Word;
 import com.liyu.huahui.ui.MainActivity;
@@ -17,6 +14,8 @@ import com.liyu.huahui.utils.DownloadUtil;
 import com.liyu.huahui.utils.Player;
 
 import java.util.List;
+
+import androidx.core.content.ContextCompat;
 
 /**
  * Created by liyu on 2017/3/2.
