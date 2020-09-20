@@ -1,272 +1,257 @@
-package com.liyu.huahui.ui;
+package com.liyu.huahui.ui
 
-import android.app.ActivityOptions;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.app.ActivityOptions
+import android.app.ProgressDialog
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.liyu.huahui.App
+import com.liyu.huahui.R
+import com.liyu.huahui.adapter.WordAdapter
+import com.liyu.huahui.model.Word
+import com.liyu.huahui.utils.DownloadUtil.MultiFileDownloadListener
+import com.liyu.huahui.utils.DownloadUtil.start
+import com.liyu.huahui.utils.DownloadUtil.stop
+import com.liyu.huahui.utils.NetworkUtil.isConnected
+import com.liyu.huahui.utils.Player.Companion.instance
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.litepal.crud.DataSupport
+import rx.Observable
+import rx.Observer
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
+import java.io.IOException
+import java.text.Collator
+import java.util.*
 
-import com.liyu.huahui.utils.DownloadUtil;
-import com.liyu.huahui.utils.NetworkUtil;
-import com.liyu.huahui.utils.Player;
-import com.liyu.huahui.R;
-import com.liyu.huahui.model.Word;
-import com.liyu.huahui.adapter.WordAdapter;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.litepal.crud.DataSupport;
-
-import java.io.IOException;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import rx.Observable;
-import rx.Observer;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
-
-public class MainActivity extends AppCompatActivity {
-
-    private RecyclerView recyclerView;
-    private WordAdapter adapter;
-    private ProgressDialog dialog;
-    private TextView tvTotal;
-    private FloatingActionButton fabAdd;
-
-    private static final int REQUEST_QUERY_WORD = 110;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        fabAdd = (FloatingActionButton) findViewById(R.id.fab_add);
-        fabAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, QueryActivity.class);
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, fabAdd, getString(R.string.transition_dialog));
-                startActivityForResult(intent, REQUEST_QUERY_WORD, options.toBundle());
-            }
-        });
-        tvTotal = (TextView) findViewById(R.id.tv_total);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new WordAdapter(R.layout.item_word, null);
-        adapter.openLoadAnimation();
-        recyclerView.setAdapter(adapter);
-        adapter.setDataChangedListener(new WordAdapter.OnDataChangedListener() {
-            @Override
-            public void onChanged(int dateSize) {
-                tvTotal.setText(String.format("总计：%s个", dateSize));
-            }
-        });
-        getWords();
+class MainActivity : AppCompatActivity() {
+    private var recyclerView: RecyclerView? = null
+    private var adapter: WordAdapter? = null
+    private var dialog: ProgressDialog? = null
+    private var tvTotal: TextView? = null
+    private var fabAdd: FloatingActionButton? = null
+    private var app: App? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        val toolbar = findViewById<View>(R.id.toolbar) as Toolbar
+        setSupportActionBar(toolbar)
+        fabAdd = findViewById<View>(R.id.fab_add) as FloatingActionButton
+        fabAdd!!.setOnClickListener {
+            val intent = Intent(this@MainActivity, QueryActivity::class.java)
+            val options = ActivityOptions.makeSceneTransitionAnimation(this@MainActivity, fabAdd, getString(R.string.transition_dialog))
+            startActivityForResult(intent, REQUEST_QUERY_WORD, options.toBundle())
+        }
+        tvTotal = findViewById<View>(R.id.tv_total) as TextView
+        recyclerView = findViewById<View>(R.id.recyclerView) as RecyclerView
+        recyclerView!!.layoutManager = LinearLayoutManager(this)
+        adapter = WordAdapter(R.layout.item_word, null)
+        //adapter.openLoadAnimation();
+        recyclerView!!.adapter = adapter
+        adapter!!.setDataChangedListener(object : WordAdapter.OnDataChangedListener {
+            override fun onChanged(dateSize: Int) {
+                tvTotal!!.text = String.format("总计：%s个", dateSize)
+            }})
+        app = applicationContext as App
+        words
     }
-
 
     /**
      * 优先从本地数据库获取数据，如果为空则从网络拉取
      */
-    private void getWords() {
-
-        Observable<List<Word>> database = Observable.create(new Observable.OnSubscribe<List<Word>>() {
-            @Override
-            public void call(Subscriber<? super List<Word>> subscriber) {
-                List<Word> words = DataSupport
-                        .where("sourceFrom =?", String.valueOf(Word.From.NETWORK.getFrom()))
-                        .find(Word.class);
+    private val words: Unit
+        get() {
+            val database: Observable<List<Word>> = Observable.create { subscriber ->
+                val words = DataSupport
+                        .where("sourceFrom =?", Word.From.NETWORK.from.toString())
+                        .find(Word::class.java)
                 if (words == null || words.isEmpty()) {
-                    subscriber.onCompleted();
+                    subscriber.onCompleted()
                 } else {
-                    subscriber.onNext(words);
+                    subscriber.onNext(words)
                 }
             }
-        });
-
-        Observable<List<Word>> network = Observable
-                .just("https://github.com/shimohq/chinese-programmer-wrong-pronunciation")
-                .map(new Func1<String, List<Word>>() {
-                    @Override
-                    public List<Word> call(String url) {
-                        List<Word> words = new ArrayList<>();
-                        Document doc;
-                        try {
-                            doc = Jsoup.connect(url).timeout(20000).get();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
+            val network = Observable
+                    .just("https://github.com/shimohq/chinese-programmer-wrong-pronunciation")
+                    .map<List<Word>> { url ->
+                        val words: MutableList<Word> = ArrayList()
+                        val doc: Document
+                        doc = try {
+                            Jsoup.connect(url).timeout(20000).get()
+                        } catch (e: IOException) {
+                            throw RuntimeException(e)
                         }
-                        Elements trs = doc.select("tr");
-                        for (Element element : trs) {
-                            Elements tds = element.select("td");
-                            if (tds != null && tds.size() == 3) {
-                                Word word = new Word();
-                                word.setName(tds.get(0).ownText());
-                                Element a = tds.get(0).select("a").first();
-                                word.setVoiceUrl(a == null ? "" : a.attr("href"));
-                                word.setCorrectPhonetic(tds.get(1).ownText());
-                                word.setWrongPhonetic(tds.get(2).ownText());
-                                word.setSourceFrom(Word.From.NETWORK);
-                                words.add(word);
+                        val trs = doc.select("tr")
+                        for (element in trs) {
+                            val tds = element.select("td")
+                            if (tds != null && tds.size == 3) {
+                                val word = Word()
+                                word.name = tds[0].ownText()
+                                //val a = tds[0].select("a").first()
+                                //word.setVoiceUrl(if (a == null) "" else a.attr("href"))
+                                word.correctPhonetic = tds[1].ownText()
+                                word.wrongPhonetic = tds[2].ownText()
+                                word.setSourceFrom(Word.From.NETWORK)
+                                words.add(word)
+                            } else if (tds != null && tds.size == 4) {
+                                val word = Word()
+                                word.name = tds[0].ownText()
+                                //val a = tds[1].select("a").first()
+                                //word.setVoiceUrl(if (a == null) "" else a.attr("href"))
+                                word.correctPhonetic = tds[1].ownText()+",美音: "+tds[2].ownText()
+                                word.wrongPhonetic = tds[3].ownText()
+                                word.setSourceFrom(Word.From.NETWORK)
+                                words.add(word)
                             }
                         }
-                        DataSupport.saveAll(words);
-                        return words;
+                        DataSupport.saveAll(words)
+                        words
                     }
-                });
+            showDialog("正在从 Github 上获取数据...")
+            Observable
+                    .concat(database, network)
+                    .first()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object : Observer<List<Word?>?> {
+                        override fun onCompleted() {
+                            closeDialog()
+                        }
 
-        showDialog("正在从 Github 上获取数据...");
-        Observable
-                .concat(database, network)
-                .first()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Word>>() {
-                    @Override
-                    public void onCompleted() {
-                        closeDialog();
-                    }
+                        override fun onError(e: Throwable) {
+                            closeDialog()
+                            Toast.makeText(this@MainActivity, e.toString(), Toast.LENGTH_SHORT).show()
+                        }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        closeDialog();
-                        Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onNext(List<Word> words) {
-                        List<Word> allWords = DataSupport.findAll(Word.class);
-                        tvTotal.setText(String.format("总计：%s个", allWords.size()));
-                        adapter.setNewData(allWords);
-                        sortData();
-                    }
-                });
-
-    }
-
-    private void sortData() {
-        final Collator collator = Collator.getInstance();
-        Collections.sort(adapter.getData(), new Comparator<Word>() {
-            @Override
-            public int compare(Word o1, Word o2) {
-                return collator.compare(o1.getName(), o2.getName());
-            }
-        });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_home_page) {
-            Uri uri = Uri.parse("https://github.com/li-yu/Huahui-Android");
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setData(uri);
-            startActivity(intent);
-            return true;
-        } else if (id == R.id.action_sync) {
-            DataSupport.deleteAll(Word.class, "sourceFrom =?", String.valueOf(Word.From.NETWORK.getFrom()));
-            getWords();
-            return true;
-        } else if (id == R.id.action_cache) {
-            if (!NetworkUtil.isConnected()) {
-                Toast.makeText(MainActivity.this, "网络连接不可用！", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            List<Word> words = DataSupport.findAll(Word.class);
-            DownloadUtil.start(words, new DownloadUtil.MultiFileDownloadListener() {
-                @Override
-                public void onProcess(String msg) {
-                    showDialog(msg);
-                }
-
-                @Override
-                public void onCompleted() {
-                    closeDialog();
-                    Toast.makeText(MainActivity.this, "缓存成功！", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onFail(String msg) {
-                    closeDialog();
-                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-                }
-            });
-            return true;
+                        override fun onNext(words: List<Word?>?) {
+                            val allWords = DataSupport.findAll(Word::class.java)
+                            tvTotal!!.text = String.format("总计：%s个", allWords.size)
+                            adapter!!.setNewData(allWords)
+                            sortData()
+                        }
+                    })
         }
-        return super.onOptionsItemSelected(item);
+
+    private fun sortData() {
+        val collator = Collator.getInstance()
+        adapter!!.data.sortWith { o1, o2 -> collator.compare(o1.name, o2.name) }
     }
 
-    private void closeDialog() {
-        if (dialog != null && dialog.isShowing()) {
-            dialog.dismiss();
-        }
-    }
-
-    private void showDialog(String msg) {
-        if (dialog == null) {
-            dialog = new ProgressDialog(this);
-            dialog.setCancelable(false);
-            dialog.setMessage(msg);
-            dialog.show();
-        } else if (dialog.isShowing()) {
-            dialog.setMessage(msg);
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        if (App.accent == Word.Accent.US) {
+            menu.findItem(R.id.action_EN).setTitle(R.string.action_US)
         } else {
-            dialog.setMessage(msg);
-            dialog.show();
+            menu.findItem(R.id.action_EN).setTitle(R.string.action_GB)
+        }
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == R.id.action_home_page) {
+            val uri = Uri.parse("https://github.com/li-yu/Huahui-Android")
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            intent.data = uri
+            startActivity(intent)
+            return true
+        } else if (id == R.id.action_sync) {
+            DataSupport.deleteAll(Word::class.java, "sourceFrom =?", Word.From.NETWORK.from.toString())
+            words
+            return true
+        } else if (id == R.id.action_EN) {
+            if (item.title == getString(R.string.action_GB)) {
+                item.setTitle(R.string.action_US)
+                App.accent = Word.Accent.US
+            } else {
+                item.setTitle(R.string.action_GB)
+                App.accent = Word.Accent.GB
+            }
+            return true
+        } else if (id == R.id.action_cache) {
+            if (!isConnected(this)) {
+                Toast.makeText(this@MainActivity, "网络连接不可用！", Toast.LENGTH_SHORT).show()
+                return true
+            }
+            val words = DataSupport.findAll(Word::class.java)
+            start(this, words, object : MultiFileDownloadListener {
+                override fun onProcess(msg: String?) {
+                    showDialog(msg)
+                }
+
+                override fun onCompleted() {
+                    closeDialog()
+                    Toast.makeText(this@MainActivity, "缓存成功！", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onFail(msg: String?) {
+                    closeDialog()
+                    Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
+                }
+            })
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun closeDialog() {
+        if (dialog != null && dialog!!.isShowing) {
+            dialog!!.dismiss()
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Player.getInstance().destroy();
-        DownloadUtil.stop();
+    private fun showDialog(msg: String?) {
+        if (dialog == null) {
+            dialog = ProgressDialog(this)
+            dialog!!.setCancelable(false)
+            dialog!!.setMessage(msg)
+            dialog!!.show()
+        } else if (dialog!!.isShowing) {
+            dialog!!.setMessage(msg)
+        } else {
+            dialog!!.setMessage(msg)
+            dialog!!.show()
+        }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    override fun onDestroy() {
+        super.onDestroy()
+        instance!!.destroy()
+        stop()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_QUERY_WORD && resultCode == RESULT_OK && data != null) {
-            Word word = (Word) data.getSerializableExtra(QueryActivity.EXTRA_WORD);
-            if (adapter.getData().contains(word)) {
-                Toast.makeText(this, "列表中已包含 " + word.getName(), Toast.LENGTH_SHORT).show();
-            } else if (word.getCorrectPhonetic().contains("null")) {
-                Toast.makeText(this, "该单词没有找到合适的读法", Toast.LENGTH_SHORT).show();
+            val word = data.getSerializableExtra(QueryActivity.EXTRA_WORD) as Word
+            if (adapter!!.data.contains(word)) {
+                Toast.makeText(this, "列表中已包含 " + word.name, Toast.LENGTH_SHORT).show()
+            } else if (word.correctPhonetic == null || word.correctPhonetic!!.contains("null")) {
+                Toast.makeText(this, "该单词没有找到合适的读法", Toast.LENGTH_SHORT).show()
             } else {
-                word.save();
-                adapter.addData(word);
-                sortData();
-                adapter.notifyDataSetChanged();
-                int wordIndex = adapter.getData().indexOf(word);
-                recyclerView.smoothScrollToPosition(wordIndex);
+                word.save()
+                adapter!!.addData(word)
+                sortData()
+                adapter!!.notifyDataSetChanged()
+                val wordIndex = adapter!!.data.indexOf(word)
+                recyclerView!!.smoothScrollToPosition(wordIndex)
             }
         }
+    }
+
+    companion object {
+        private const val REQUEST_QUERY_WORD = 110
     }
 }

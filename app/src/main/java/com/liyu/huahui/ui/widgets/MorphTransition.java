@@ -6,7 +6,7 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.transition.ChangeBounds;
 import android.transition.TransitionValues;
 import android.util.AttributeSet;
@@ -97,8 +97,8 @@ public class MorphTransition extends ChangeBounds {
         MorphDrawable background = new MorphDrawable(startColor, startCornerRadius);
         endValues.view.setBackground(background);
 
-        Animator color = ObjectAnimator.ofArgb(background, background.COLOR, endColor);
-        Animator corners = ObjectAnimator.ofFloat(background, background.CORNER_RADIUS, endCornerRadius);
+        Animator color = ObjectAnimator.ofArgb(background, MorphDrawable.COLOR, endColor);
+        Animator corners = ObjectAnimator.ofFloat(background, MorphDrawable.CORNER_RADIUS, endCornerRadius);
 
         // ease in the dialog's child views (slide up & fade in)
         if (isShowViewGroup) {

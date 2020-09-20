@@ -26,9 +26,11 @@ public class RetrofitManager {
                 .build();
     }
 
-    public static void reset() {
-        instance = null;
-    }
+// --Commented out by Inspection START (2020/9/20 15:16):
+//    public static void reset() {
+//        instance = null;
+//    }
+// --Commented out by Inspection STOP (2020/9/20 15:16)
 
     public static RetrofitManager getInstance() {
         if (instance == null) {
@@ -43,11 +45,13 @@ public class RetrofitManager {
         return retrofit.create(service);
     }
 
-    private static OkHttpClient getNewClient() {
-        return new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.MINUTES)
-                .build();
-    }
+// --Commented out by Inspection START (2020/9/20 15:16):
+//    private static OkHttpClient getNewClient() {
+//        return new OkHttpClient.Builder()
+//                .connectTimeout(10, TimeUnit.SECONDS)
+//                .readTimeout(5, TimeUnit.MINUTES)
+//                .build();
+//    }
+// --Commented out by Inspection STOP (2020/9/20 15:16)
 
 }

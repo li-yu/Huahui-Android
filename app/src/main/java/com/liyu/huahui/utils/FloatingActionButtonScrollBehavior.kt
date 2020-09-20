@@ -1,50 +1,38 @@
-package com.liyu.huahui.utils;
+package com.liyu.huahui.utils
 
-import android.content.Context;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewCompat;
-import android.util.AttributeSet;
-import android.view.View;
+import android.content.Context
+import android.util.AttributeSet
+import android.view.View
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton.OnVisibilityChangedListener
 
 /**
  * Created by liyu on 2016/11/29.
  */
-
-public class FloatingActionButtonScrollBehavior extends FloatingActionButton.Behavior {
-
-    public FloatingActionButtonScrollBehavior(Context context, AttributeSet attrs) {
-        super();
-    }
-
-    @Override
-    public boolean onStartNestedScroll(final CoordinatorLayout coordinatorLayout, final
-    FloatingActionButton child, final View directTargetChild, final View target, final int
-                                               nestedScrollAxes) {
+class FloatingActionButtonScrollBehavior(context: Context?, attrs: AttributeSet?) : FloatingActionButton.Behavior() {
+    override fun onStartNestedScroll(coordinatorLayout: CoordinatorLayout, child: FloatingActionButton, directTargetChild: View, target: View, nestedScrollAxes: Int): Boolean {
         // 确保是竖直判断的滚动
-        return nestedScrollAxes == ViewCompat.SCROLL_AXIS_VERTICAL || super.onStartNestedScroll
-                (coordinatorLayout, child, directTargetChild, target, nestedScrollAxes);
+        return nestedScrollAxes == ViewCompat.SCROLL_AXIS_VERTICAL || super.onStartNestedScroll(coordinatorLayout, child, directTargetChild, target, nestedScrollAxes)
     }
 
-    @Override
-    public void onNestedScroll(final CoordinatorLayout coordinatorLayout, final
-    FloatingActionButton child, final View target, final int dxConsumed, final int dyConsumed,
-                               final int dxUnconsumed, final int dyUnconsumed) {
+    override fun onNestedScroll(coordinatorLayout: CoordinatorLayout, child: FloatingActionButton, target: View, dxConsumed: Int, dyConsumed: Int,
+                                dxUnconsumed: Int, dyUnconsumed: Int) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed,
-                dxUnconsumed, dyUnconsumed);
-        if (dyConsumed > 0 && child.getVisibility() == View.VISIBLE) {
+                dxUnconsumed, dyUnconsumed)
+        if (dyConsumed > 0 && child.visibility == View.VISIBLE) {
             /** design lib 升级到 25.1.0 导致 child.hide() 效果失效，法克哟
-             *  http://stackoverflow.com/questions/41761736/android-design-library-25-1-0-causes-floatingactionbutton-behavior-to-stop-worki
+             * http://stackoverflow.com/questions/41761736/android-design-library-25-1-0-causes-floatingactionbutton-behavior-to-stop-worki
              */
-            child.hide(new FloatingActionButton.OnVisibilityChangedListener() {
-                @Override
-                public void onHidden(FloatingActionButton fab) {
-                    super.onHidden(fab);
-                    fab.setVisibility(View.INVISIBLE);
+            child.hide(object : OnVisibilityChangedListener() {
+                override fun onHidden(fab: FloatingActionButton) {
+                    super.onHidden(fab)
+                    fab.visibility = View.INVISIBLE
                 }
-            });
-        } else if (dyConsumed < 0 && child.getVisibility() != View.VISIBLE) {
-            child.show();
+            })
+        } else if (dyConsumed < 0 && child.visibility != View.VISIBLE) {
+            child.show()
         }
     }
 }

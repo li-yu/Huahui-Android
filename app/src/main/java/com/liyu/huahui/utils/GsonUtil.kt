@@ -1,21 +1,19 @@
-package com.liyu.huahui.utils;
+package com.liyu.huahui.utils
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+
 /**
  * Created by liyu on 2017/3/16.
  */
-
-public class GsonUtil {
-
-    private static Gson mGson;
-
-    public static Gson getGson() {
-        if (mGson == null) {
-            synchronized (GsonUtil.class) {
-                mGson = new GsonBuilder().setLenient().create();
+object GsonUtil {
+    private var mGson: Gson? = null
+    @JvmStatic
+    val gson: Gson?
+        get() {
+            if (mGson == null) {
+                synchronized(GsonUtil::class.java) { mGson = GsonBuilder().setLenient().create() }
             }
+            return mGson
         }
-        return mGson;
-    }
 }

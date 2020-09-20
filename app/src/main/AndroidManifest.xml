@@ -30,7 +30,7 @@
             android:windowSoftInputMode="adjustResize|stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.liyu.huahui.ui.MainActivity"/>>
+                android:value="com.liyu.huahui.ui.MainActivity"/>
         </activity>
     </application>
 

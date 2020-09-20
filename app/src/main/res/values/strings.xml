@@ -2,6 +2,10 @@
     <string name="app_name">花灰</string>
     <string name="action_home_page">访问项目主页</string>
     <string name="action_sync">同步单词</string>
+    <string name="action_US">切换美音</string>
+    <string name="action_GB">切换英音</string>
     <string name="action_cache">缓存音频</string>
     <string name="transition_dialog">transition_dialog</string>
+    <string name="wrong">错误</string>
+    <string name="correct">正确</string>
 </resources>

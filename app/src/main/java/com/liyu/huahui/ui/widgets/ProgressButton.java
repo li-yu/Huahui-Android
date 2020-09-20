@@ -20,24 +20,15 @@ import android.view.animation.Transformation;
  */
 
 public class ProgressButton extends View {
-    private int progerssButtonDuration = 200;
-    private int scaleAnimationDuration = 300;
-    private int rotateAnimationDuration = 400;
 
     private Paint paintRectF;
     private Paint paintText;
 
     private Paint paintPro;
 
-    private int mStrokeWidth = 0;
     private int mPadding = 0;
 
     private float mSpac = 0;
-    private float mRadius = 0;
-
-    private int mProRadius = 0;
-
-    private float startAngle = 0f;
 
     private ProgerssButtonAnim mProgerssButtonAnim;
     private ScaleAnimation mProgerssScaleAnim;
@@ -85,9 +76,9 @@ public class ProgressButton extends View {
     }
 
     private void initPaint() {
-        mStrokeWidth = dip2px(2);
+        int mStrokeWidth = dip2px(2);
         mPadding = dip2px(2);
-        mProRadius = getMeasuredHeight() / 5;
+        int mProRadius = getMeasuredHeight() / 5;
 
 
         mProgerssButtonAnim = new ProgerssButtonAnim();
@@ -124,7 +115,7 @@ public class ProgressButton extends View {
         mRectF.top = mPadding;
         mRectF.right = getMeasuredWidth() - mPadding - mSpac;
         mRectF.bottom = getMeasuredHeight() - mPadding;
-        mRadius = (getMeasuredHeight() - 2 * mPadding) / 2;
+        float mRadius = (getMeasuredHeight() - 2 * mPadding) / 2;
 
         canvas.drawRoundRect(mRectF, mRadius, mRadius, paintRectF);
 
@@ -135,6 +126,7 @@ public class ProgressButton extends View {
             mRectFPro.top = getMeasuredHeight() / 2.0f - mRectF.width() / 4;
             mRectFPro.right = getMeasuredWidth() / 2.0f + mRectF.width() / 4;
             mRectFPro.bottom = getMeasuredHeight() / 2.0f + mRectF.width() / 4;
+            float startAngle = 0f;
             canvas.drawArc(mRectFPro, startAngle, 100, false, paintPro);
         }
 
@@ -155,6 +147,7 @@ public class ProgressButton extends View {
         setClickable(false);
         if (mProgerssButtonAnim != null)
             clearAnimation();
+        int progerssButtonDuration = 200;
         mProgerssButtonAnim.setDuration(progerssButtonDuration);
         startAnimation(mProgerssButtonAnim);
     }
@@ -162,6 +155,7 @@ public class ProgressButton extends View {
     public void startProAnim() {
         if (mProgerssRotateAnim != null)
             clearAnimation();
+        int rotateAnimationDuration = 400;
         mProgerssRotateAnim.setDuration(rotateAnimationDuration);
         startAnimation(mProgerssRotateAnim);
 
@@ -184,6 +178,7 @@ public class ProgressButton extends View {
                     1.0f, width / getMeasuredHeight() * 3.5f,
                     Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         }
+        int scaleAnimationDuration = 300;
         mProgerssScaleAnim.setDuration(scaleAnimationDuration);
         startAnimation(mProgerssScaleAnim);
         mProgerssScaleAnim.setAnimationListener(new Animation.AnimationListener() {

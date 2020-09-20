@@ -7,17 +7,26 @@
         android:orderInCategory="100"
         android:icon="@drawable/ic_github"
         android:title="@string/action_home_page"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_sync"
         android:orderInCategory="101"
+        android:icon="@android:drawable/ic_popup_sync"
         android:title="@string/action_sync"
-        app:showAsAction="never"/>
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_EN"
+        android:orderInCategory="102"
+        android:icon="@android:drawable/stat_notify_voicemail"
+        android:title="@string/action_US"
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_cache"
-       android:orderInCategory="102"
+       android:orderInCategory="103"
+        android:icon="@android:drawable/stat_sys_download"
         android:title="@string/action_cache"
-        app:showAsAction="never"/>
+        app:showAsAction="ifRoom"/>
 </menu>

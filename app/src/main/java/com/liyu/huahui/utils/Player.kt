@@ -1,71 +1,63 @@
-package com.liyu.huahui.utils;
+package com.liyu.huahui.utils
 
-import android.media.MediaPlayer;
+import android.media.MediaPlayer
 
 /**
  * Created by liyu on 2017/3/3.
  */
+class Player private constructor() {
 
-public class Player {
-
-    protected static final Object monitor = new Object();
-    private static MediaPlayer mediaPlayer;
-    private static Player player;
-
-    private Player() {
-        mediaPlayer = new MediaPlayer();
-    }
-
-    public static Player getInstance() {
-        if (player == null) {
-            synchronized (monitor) {
-                player = new Player();
-            }
-        }
-        return player;
-    }
-
-    public void play(String url) {
-        try {
-            if (mediaPlayer.isPlaying()) {
-                stop();
-            }
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(url);
-            mediaPlayer.prepare();
-            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mediaPlayer) {
-                    mediaPlayer.start();
+    companion object {
+        private val monitor = Any()
+        private var mediaPlayer: MediaPlayer? = MediaPlayer()
+        private var player: Player? = null
+        @JvmStatic
+        val instance: Player?
+            get() {
+                if (player == null) {
+                    synchronized(monitor) { player = Player() }
                 }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
+                return player
+            }
+    }
+
+    fun play(url: String?) {
+        try {
+            if (mediaPlayer!!.isPlaying) {
+                stop()
+            }
+            mediaPlayer!!.reset()
+            mediaPlayer!!.setDataSource(url)
+            mediaPlayer!!.prepare()
+            mediaPlayer!!.setOnPreparedListener { mediaPlayer -> mediaPlayer.start() }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    public void pause() {
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
+    fun pause() {
+        if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
+            mediaPlayer!!.pause()
         }
     }
 
-    public void stop() {
+    private fun stop() {
         if (mediaPlayer != null) {
-            mediaPlayer.stop();
+            mediaPlayer!!.stop()
             try {
-                mediaPlayer.prepare();
-            } catch (Exception e) {
-                e.printStackTrace();
+                mediaPlayer!!.prepare()
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
 
-    public void destroy() {
+    fun destroy() {
         if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
+            mediaPlayer!!.stop()
+            mediaPlayer!!.release()
         }
-        player = null;
+        player = null
     }
+
 }

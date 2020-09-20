@@ -1,175 +1,95 @@
-package com.liyu.huahui.utils;
+package com.liyu.huahui.utils
 
-import android.os.Handler;
-import android.os.Looper;
-import android.text.TextUtils;
-
-import com.liulishuo.filedownloader.BaseDownloadTask;
-import com.liulishuo.filedownloader.FileDownloadListener;
-import com.liulishuo.filedownloader.FileDownloadQueueSet;
-import com.liulishuo.filedownloader.FileDownloader;
-import com.liyu.huahui.App;
-import com.liyu.huahui.model.Word;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.text.TextUtils
+import com.liulishuo.filedownloader.BaseDownloadTask
+import com.liulishuo.filedownloader.FileDownloadListener
+import com.liulishuo.filedownloader.FileDownloadQueueSet
+import com.liulishuo.filedownloader.FileDownloader
+import com.liyu.huahui.App
+import com.liyu.huahui.model.Word
+import java.util.*
 
 /**
  * Created by liyu on 2017/7/11.
  */
+object DownloadUtil {
 
-public class DownloadUtil {
+    private val handler = Handler(Looper.getMainLooper())
 
-    private static Handler handler = new Handler(Looper.getMainLooper());
-
-    public static void start(Word word, final SingleFileDownloadListener listener) {
-        FileDownloader.getImpl().create(word.getVoiceUrl()).setTag(word.getName()).setPath(App.getContext().getFilesDir().getPath() + "/" + word + ".mp3")
-                .setListener(new FileDownloadListener() {
-                    @Override
-                    protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-
+    fun start(ctx: Context, word: Word, listener: SingleFileDownloadListener?) {
+        FileDownloader.getImpl().create(word.voiceUrl + "&type=" + App.accent.id).setTag(word.name).setPath(ctx.filesDir.path.toString() + "/" + word.name + App.accent + ".mp3")
+                .setListener(object : FileDownloadListener() {
+                    override fun pending(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {}
+                    override fun progress(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {}
+                    override fun completed(task: BaseDownloadTask) {
+                        listener?.onCompleted(task.path)
                     }
 
-                    @Override
-                    protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-
+                    override fun paused(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {}
+                    override fun error(task: BaseDownloadTask, e: Throwable) {
+                        listener?.onFail(e.message)
                     }
 
-                    @Override
-                    protected void completed(BaseDownloadTask task) {
-
-                        if (listener != null) {
-                            listener.onCompleted(task.getPath());
-                        }
-
-                    }
-
-                    @Override
-                    protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-
-                    }
-
-                    @Override
-                    protected void error(BaseDownloadTask task, Throwable e) {
-                        if (listener != null) {
-                            listener.onFail(e.getMessage());
-                        }
-                    }
-
-                    @Override
-                    protected void warn(BaseDownloadTask task) {
-
-                    }
+                    override fun warn(task: BaseDownloadTask) {}
                 })
-                .start();
+                .start()
     }
 
-    public static void start(final List<Word> list, final MultiFileDownloadListener listener) {
-        final FileDownloadListener queueTarget = new FileDownloadListener() {
-            @Override
-            protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-            }
+    fun stop() {
+        FileDownloader.getImpl().pauseAll()
+    }
 
-            @Override
-            protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
-            }
-
-            @Override
-            protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-            }
-
-            @Override
-            protected void blockComplete(BaseDownloadTask task) {
-            }
-
-            @Override
-            protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
-            }
-
-            @Override
-            protected void completed(BaseDownloadTask task) {
-            }
-
-            @Override
-            protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-            }
-
-            @Override
-            protected void error(final BaseDownloadTask task, final Throwable e) {
+    fun start(ctx: Context, list: List<Word>, listener: MultiFileDownloadListener?) {
+        val queueTarget: FileDownloadListener = object : FileDownloadListener() {
+            override fun pending(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {}
+            override fun connected(task: BaseDownloadTask, etag: String, isContinue: Boolean, soFarBytes: Int, totalBytes: Int) {}
+            override fun progress(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {}
+            override fun blockComplete(task: BaseDownloadTask) {}
+            override fun retry(task: BaseDownloadTask, ex: Throwable, retryingTimes: Int, soFarBytes: Int) {}
+            override fun completed(task: BaseDownloadTask) {}
+            override fun paused(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {}
+            override fun error(task: BaseDownloadTask, e: Throwable) {
                 if (listener != null) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onFail(String.format("%s 下载失败！%s", task.getTag(), e.getMessage()));
-                        }
-                    });
+                    handler.post { listener.onFail(String.format("%s 下载失败！%s", task.tag, e.message)) }
                 }
             }
 
-            @Override
-            protected void warn(BaseDownloadTask task) {
-            }
-        };
-
-        final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(queueTarget);
-
-        final List<BaseDownloadTask> tasks = new ArrayList<>();
-
-        for (Word word : list) {
-            if (!TextUtils.isEmpty(word.getVoiceUrl()))
-                tasks.add(FileDownloader.getImpl().create(word.getVoiceUrl()).setPath(App.getContext().getFilesDir().getPath() + "/" + word.getName() + ".mp3").setTag(word.getName()));
+            override fun warn(task: BaseDownloadTask) {}
         }
-
-        queueSet.disableCallbackProgressTimes();
-
-        queueSet.setAutoRetryTimes(1);
-
-        queueSet.addTaskFinishListener(new BaseDownloadTask.FinishListener() {
-            private int finishedTaskCount = 0;
-
-            @Override
-            public void over(BaseDownloadTask task) {
-                finishedTaskCount++;
+        val queueSet = FileDownloadQueueSet(queueTarget)
+        val tasks: MutableList<BaseDownloadTask> = ArrayList()
+        for (word in list) {
+            if (!TextUtils.isEmpty(word.voiceUrl)) tasks.add(FileDownloader.getImpl().create(word.voiceUrl + "&type=" + App.accent.id).setPath(ctx.filesDir.path.toString() + "/" + word.name + App.accent + ".mp3").setTag(word.name))
+        }
+        queueSet.disableCallbackProgressTimes()
+        queueSet.setAutoRetryTimes(1)
+        queueSet.addTaskFinishListener(object : BaseDownloadTask.FinishListener {
+            private var finishedTaskCount = 0
+            override fun over(task: BaseDownloadTask) {
+                finishedTaskCount++
                 if (listener != null) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onProcess(String.format("已完成 %s/%s 个音频缓存...", finishedTaskCount, tasks.size()));
-                        }
-                    });
-                    if (finishedTaskCount == tasks.size()) {
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                listener.onCompleted();
-                            }
-                        });
+                    handler.post { listener.onProcess(String.format("已完成 %s/%s 个音频缓存...", finishedTaskCount, tasks.size)) }
+                    if (finishedTaskCount == tasks.size) {
+                        handler.post { listener.onCompleted() }
                     }
                 }
             }
-        });
-
-        queueSet.downloadTogether(tasks);
-
-        queueSet.start();
+        })
+        queueSet.downloadTogether(tasks)
+        queueSet.start()
     }
 
-    public static void stop() {
-        FileDownloader.getImpl().pauseAll();
+    interface MultiFileDownloadListener {
+        fun onProcess(msg: String?)
+        fun onCompleted()
+        fun onFail(msg: String?)
     }
 
-    public interface MultiFileDownloadListener {
-        void onProcess(String msg);
-
-        void onCompleted();
-
-        void onFail(String msg);
-    }
-
-    public interface SingleFileDownloadListener {
-
-        void onCompleted(String path);
-
-        void onFail(String msg);
+    interface SingleFileDownloadListener {
+        fun onCompleted(path: String?)
+        fun onFail(msg: String?)
     }
 }

@@ -11,12 +11,14 @@ public class ApiFactory {
 
     private static YoudaoApi youdaoApi;
 
-    public static YoudaoApi getYoudaoApi() {
-        if (youdaoApi == null) {
-            synchronized (monitor) {
-                youdaoApi = RetrofitManager.getInstance().create(YoudaoApi.class);
-            }
-        }
-        return youdaoApi;
-    }
+// --Commented out by Inspection START (2020/9/20 15:16):
+//    public static YoudaoApi getYoudaoApi() {
+//        if (youdaoApi == null) {
+//            synchronized (monitor) {
+//                youdaoApi = RetrofitManager.getInstance().create(YoudaoApi.class);
+//            }
+//        }
+//        return youdaoApi;
+//    }
+// --Commented out by Inspection STOP (2020/9/20 15:16)
 }
