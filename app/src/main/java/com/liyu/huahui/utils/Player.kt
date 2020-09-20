@@ -3,6 +3,7 @@ package com.liyu.huahui.utils
 import android.media.MediaPlayer
 
 /**
+ * Updated by ultranity on 2020/9/20.
  * Created by liyu on 2017/3/3.
  */
 class Player private constructor() {

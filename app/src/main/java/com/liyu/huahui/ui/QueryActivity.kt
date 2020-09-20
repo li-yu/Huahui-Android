@@ -30,6 +30,7 @@ import java.io.IOException
 import java.util.regex.Pattern
 
 /**
+ * Updated by ultranity on 2020/9/20.
  * Created by liyu on 2017/7/12.
  */
 class QueryActivity : AppCompatActivity() {

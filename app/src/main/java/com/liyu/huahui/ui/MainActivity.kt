@@ -34,7 +34,10 @@ import rx.schedulers.Schedulers
 import java.io.IOException
 import java.text.Collator
 import java.util.*
-
+/**
+ * Updated by ultranity on 2020/9/20.
+ * Created by liyu.
+ */
 class MainActivity : AppCompatActivity() {
     private var recyclerView: RecyclerView? = null
     private var adapter: WordAdapter? = null

@@ -3,6 +3,7 @@ package com.liyu.huahui.adapter
 import android.graphics.Paint
 import android.text.TextUtils
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -17,6 +18,7 @@ import com.liyu.huahui.utils.DownloadUtil.start
 import com.liyu.huahui.utils.Player.Companion.instance
 
 /**
+ * Updated by ultranity on 2020/9/20.
  * Created by liyu on 2017/3/2.
  */
 class WordAdapter(layoutResId: Int, data: List<Word>?) : BaseQuickAdapter<Word, BaseViewHolder>(layoutResId, data as MutableList<Word>?) {
@@ -31,7 +33,7 @@ class WordAdapter(layoutResId: Int, data: List<Word>?) : BaseQuickAdapter<Word, 
         }
         helper.setVisible(R.id.image_play, !TextUtils.isEmpty(item.voiceUrl))
         (helper.getView<View>(R.id.tv_wrong) as TextView).paint.flags = Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG
-        helper.getView<View>(R.id.image_play).setOnClickListener { playVoice(item) }
+        helper.getView<ImageView>(R.id.image_play).setOnClickListener { playVoice(item) }
         helper.itemView.setOnClickListener { playVoice(item) }
         helper.itemView.setOnLongClickListener {
             val deletedPosition = helper.adapterPosition

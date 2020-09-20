@@ -5,7 +5,9 @@ import android.content.SharedPreferences
 import com.liulishuo.filedownloader.FileDownloader
 import com.liyu.huahui.model.Word
 import org.litepal.LitePal
-
+/**
+ * Created by ultranity on 2020/9/20.
+ */
 class App : Application() {
     private lateinit var sharedPreferences: SharedPreferences
     override fun onCreate() {

@@ -9,6 +9,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton.OnVisibilityChangedListener
 
 /**
+ * Updated by ultranity on 2020/9/20.
  * Created by liyu on 2016/11/29.
  */
 class FloatingActionButtonScrollBehavior(context: Context?, attrs: AttributeSet?) : FloatingActionButton.Behavior() {

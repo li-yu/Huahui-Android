@@ -4,6 +4,7 @@ import org.litepal.crud.DataSupport
 import java.io.Serializable
 
 /**
+ * Updated by ultranity on 2020/9/20.
  * Created by liyu on 2017/3/2.
  */
 class Word : DataSupport(), Serializable {

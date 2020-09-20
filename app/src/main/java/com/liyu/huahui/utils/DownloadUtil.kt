@@ -13,6 +13,7 @@ import com.liyu.huahui.model.Word
 import java.util.*
 
 /**
+ * Updated by ultranity on 2020/9/20.
  * Created by liyu on 2017/7/11.
  */
 object DownloadUtil {
