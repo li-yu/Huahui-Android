@@ -22,8 +22,8 @@ import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.annotation.ColorInt;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.ColorInt;
+import androidx.annotation.RequiresApi;
 import android.util.Property;
 
 /**

@@ -16,6 +16,12 @@ iOS 版本请前往 [https://github.com/lexrus/Huahui](https://github.com/lexrus
 
 ### 版本更新
 
+v1.3 - 20200920
+- 修复
+- 增加英美音切换
+- 精简+kotlin
+- 升级依赖
+
 v1.2 - 20170714
 - 调整主题色
 - 新增音频缓存功能，节约流量
